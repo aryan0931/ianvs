@@ -1,1 +1,10 @@
 prettytable~=2.5.0 # BSD
+numpy
+pandas
+torch
+matplotlib
+pillow
+ftfy
+regex
+tqdm
+git+https://github.com/openai/CLIP.git
