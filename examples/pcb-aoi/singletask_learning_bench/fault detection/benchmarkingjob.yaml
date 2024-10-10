@@ -6,7 +6,7 @@ benchmarkingjob:
 
   # the url address of test environment configuration file; string type;
   # the file format supports yaml/yml;
-  testenv: "./examples/pcb-aoi/singletask_learning_bench/fault detection/testenv/testenv.yaml"
+  testenv: "examples/pcb-aoi/singletask_learning_bench/fault detection/testenv/testenv.yaml"
 
   # the configuration of test object
   test_object:
@@ -19,7 +19,7 @@ benchmarkingjob:
       - name: "fpn_singletask_learning"
         # the url address of test algorithm configuration file; string type;
         # the file format supports yaml/yml;
-        url: "https://github.com/aryan0931/example/blob/main/testalgorithm/basemodel.py"
+        url: "examples/pcb-aoi/singletask_learning_bench/fault detection/testalgorithms/fpn/basemodel.py"
 
   # the configuration of ranking leaderboard
   rank:
