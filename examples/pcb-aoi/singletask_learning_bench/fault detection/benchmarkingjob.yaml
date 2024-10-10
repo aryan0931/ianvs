@@ -6,7 +6,7 @@ benchmarkingjob:
 
   # the url address of test environment configuration file; string type;
   # the file format supports yaml/yml;
-  testenv: "https://github.com/aryan0931/example/blob/main/testenv/testenv.yaml"
+  testenv: "./examples/pcb-aoi/singletask_learning_bench/fault detection/testenv/testenv.yaml"
 
   # the configuration of test object
   test_object:
