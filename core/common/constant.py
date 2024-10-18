@@ -25,6 +25,8 @@ class DatasetFormat(Enum):
     CSV = "csv"
     TXT = "txt"
     JSON = "json"
+    JPG = "jpg"
+    PNG = "png"
 
 
 class ParadigmType(Enum):
