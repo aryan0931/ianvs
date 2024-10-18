@@ -23,6 +23,9 @@ from sedna.datasources import CSVDataParse, TxtDataParse, JSONDataParse
 from core.common import utils
 from core.common.constant import DatasetFormat
 
+from PIL import Image  # Add this import
+import numpy as np  # Add this import
+
 
 class Dataset:
     """
@@ -54,12 +57,18 @@ class Dataset:
 
     @classmethod
     def _check_dataset_url(cls, url):
-        if not utils.is_local_file(url) and not os.path.isabs(url):
-            raise ValueError(f"dataset file({url}) is not a local file and not a absolute path.")
+    if not utils.is_local_file(url) and not os.path.isabs(url):
+        raise ValueError(f"dataset file({url}) is not a local file and not a absolute path.")
 
-        file_format = utils.get_file_format(url)
-        if file_format not in [v.value for v in DatasetFormat.__members__.values()]:
-            raise ValueError(f"dataset file({url})'s format({file_format}) is not supported.")
+    file_format = utils.get_file_format(url)
+    supported_formats = [v.value for v in DatasetFormat.__members__.values()] + ['jpg', 'jpeg', 'png']
+    
+    if file_format not in supported_formats:
+        raise ValueError(f"dataset file({url})'s format({file_format}) is not supported.")
+
+    @classmethod
+    def _read_image_file(cls, file_url):
+        return Image.open(file_url)
 
     @classmethod
     def _process_txt_index_file(cls, file_url):
@@ -95,13 +104,18 @@ class Dataset:
         return new_file
 
     def _process_index_file(self, file_url):
-        file_format = utils.get_file_format(file_url)
-        if file_format == DatasetFormat.TXT.value:
-            return self._process_txt_index_file(file_url)
-        if file_format == DatasetFormat.JSON.value:
-            return file_url
+    file_format = utils.get_file_format(file_url)
+    
+    if file_format == DatasetFormat.TXT.value:
+        return self._process_txt_index_file(file_url)
+    
+    if file_format == DatasetFormat.JSON.value:
+        return file_url
+    
+    if file_format in ['jpg', 'jpeg', 'png']:
+        return file_url
 
-        return None
+    return None
 
     def process_dataset(self):
         """
@@ -192,16 +206,19 @@ class Dataset:
 
     @classmethod
     def _read_data_file(cls, data_file, data_format):
-        data = None
+    data = None
 
-        if data_format == DatasetFormat.TXT.value:
-            with open(data_file, "r", encoding="utf-8") as file:
-                data = [line.strip() for line in file.readlines()]
+    if data_format == DatasetFormat.TXT.value:
+        with open(data_file, "r", encoding="utf-8") as file:
+            data = [line.strip() for line in file.readlines()]
 
-        if data_format == DatasetFormat.CSV.value:
-            data = pd.read_csv(data_file)
+    if data_format == DatasetFormat.CSV.value:
+        data = pd.read_csv(data_file)
+        
+    if data_format in ['jpg', 'jpeg', 'png']:
+        data = cls._read_image_file(data_file)
 
-        return data
+    return data
 
     def _get_dataset_file(self, data, output_dir, dataset_type, index, dataset_format):
         data_file = self._get_file_url(output_dir, dataset_type, index, dataset_format)
@@ -366,42 +383,44 @@ class Dataset:
 
     @classmethod
     def load_data(cls, file: str, data_type: str, label=None, use_raw=False, feature_process=None):
-        """
-        load data
+    """
+    load data
 
-        Parameters
-        ---------
-        file: str
-            the address url of data file.
-        data_type: str
-            the type of data for special type task.
-        label: str
-            specify label of data.
-        use_raw: bool
-            if true, use all of raw data.
-        feature_process: function
-            feature processing on all of raw data.
+    Parameters
+    ---------
+    file: str
+        the address url of data file.
+    data_type: str
+        the type of data for special type task.
+    label: str
+        specify label of data.
+    use_raw: bool
+        if true, use all of raw data.
+    feature_process: function
+        feature processing on all of raw data.
 
-        Returns
-        -------
-        instance
-            e.g.: TxtDataParse, CSVDataParse.
+    Returns
+    -------
+    instance
+        e.g.: TxtDataParse, CSVDataParse.
 
-        """
-        data_format = utils.get_file_format(file)
+    """
+    data_format = utils.get_file_format(file)
 
-        data = None
-        if data_format == DatasetFormat.CSV.value:
-            data = CSVDataParse(data_type=data_type, func=feature_process)
-            data.parse(file, label=label)
+    data = None
+    if data_format == DatasetFormat.CSV.value:
+        data = CSVDataParse(data_type=data_type, func=feature_process)
+        data.parse(file, label=label)
 
-        if data_format == DatasetFormat.TXT.value:
-            data = TxtDataParse(data_type=data_type, func=feature_process)
-            #print(file)
-            data.parse(file, use_raw=use_raw)
+    if data_format == DatasetFormat.TXT.value:
+        data = TxtDataParse(data_type=data_type, func=feature_process)
+        data.parse(file, use_raw=use_raw)
 
-        if data_format == DatasetFormat.JSON.value:
-            data = JSONDataParse(data_type=data_type, func=feature_process)
-            data.parse(file)
+    if data_format == DatasetFormat.JSON.value:
+        data = JSONDataParse(data_type=data_type, func=feature_process)
+        data.parse(file)
+        
+    if data_format in ['jpg', 'jpeg', 'png']:
+        data = cls._read_image_file(file)  # Handle image data
 
-        return data
+    return data
