@@ -2,11 +2,11 @@ benchmarkingjob:
   # job name of bechmarking; string type;
   name: "benchmarkingjob"
   # the url address of job workspace that will reserve the output of tests; string type;
-  workspace: "/ianvs/singletask_learning_bench/workspace"
+  workspace: "./workspace"
 
   # the url address of test environment configuration file; string type;
   # the file format supports yaml/yml;
-  testenv: "./examples/pcb-aoi/singletask_learning_bench/testenv/testenv.yaml"
+  testenv: "/home/aryan/ianvs/examples/pcb-aoi/singletask_learning_bench/fault_detection/testenv/testenv.yaml"
 
   # the configuration of test object
   test_object:
@@ -19,7 +19,7 @@ benchmarkingjob:
       - name: "fpn_singletask_learning"
         # the url address of test algorithm configuration file; string type;
         # the file format supports yaml/yml;
-        url: "./examples/pcb-aoi/singletask_learning_bench/testalgorithms/fpn/fpn_algorithm.yaml"
+        url: "/home/aryan/ianvs/examples/pcb-aoi/singletask_learning_bench/fault_detection/testalgorithms/fpn/algo.yaml"
 
   # the configuration of ranking leaderboard
   rank:
@@ -64,9 +64,4 @@ benchmarkingjob:
     #  1> "selected_and_all": save selected and all dataitems;
     #  2> "selected_only": save selected dataitems;
     save_mode: "selected_and_all"
-
-
-
-
-
 
